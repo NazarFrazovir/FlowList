@@ -216,3 +216,73 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+bin/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual Environments
+.venv/
+venv/
+ENV/
+env/
+python/
+
+# Frontend (Node/Web)
+node_modules/
+.eslintcache
+.stylelintcache
+*.log
+package-lock.json
+yarn.lock
+
+# macOS specific files (оскільки ви працюєте на Mac)
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.DocumentRevisions-V1
+.fseventsd
+.Spotlight-V100
+.Trashes
+*.icloud
+
+# IDEs (PyCharm / VS Code)
+.idea/
+.vscode/
+*.swp
+*.bak
+*.tmp
+
+# Environment variables (важливо для безпеки)
+.env
+.env.local
+.env.*.local
+
+# Database
+*.db
+*.sqlite3
