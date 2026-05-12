@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="uk" data-theme="sand">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Flowlist — Профіль</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root, [data-theme="sand"] {
+      --bg:         #f7f4ee;
+      --bg2:        #f0ece3;
+      --surface:    #ffffff;
+      --surface2:   #faf8f4;
+      --border:     #e4dfd5;
+      --ink:        #1a1814;
+      --ink-muted:  #8c8880;
+      --ink-faint:  #c0bab2;
+      --accent:     #2d5a27;
+      --accent-lt:  #e8f0e6;
+      --accent-dim: rgba(45,90,39,0.12);
+      --danger:     #c0392b;
+      --shadow:     0 2px 20px rgba(26,24,20,0.07);
+      --shadow-lg:  0 8px 40px rgba(26,24,20,0.12);
+      --radius-sm:  8px;
+      --radius:     14px;
+      --radius-lg:  20px;
+    }
+
+    [data-theme="midnight"] {
+      --bg:         #0f0f0f;
+      --bg2:        #161616;
+      --surface:    #1c1c1c;
+      --surface2:   #232323;
+      --border:     #2e2e2e;
+      --ink:        #f0ede8;
+      --ink-muted:  #7a7570;
+      --ink-faint:  #3a3a3a;
+      --accent:     #4a9e42;
+      --accent-lt:  #1a2e18;
+      --accent-dim: rgba(74,158,66,0.15);
+      --danger:     #e05450;
+      --shadow:     0 2px 20px rgba(0,0,0,0.35);
+      --shadow-lg:  0 8px 40px rgba(0,0,0,0.5);
+      --radius-sm:  8px;
+      --radius:     14px;
+      --radius-lg:  20px;
+    }
+
+    html { font-size: 16px; }
+    body {
+      font-family: 'Jost', sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+      transition: background 0.4s, color 0.4s;
+    }
+
+    /* ── Header ── */
+    .app-header {
+      position: sticky; top: 0; z-index: 5;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 18px 48px;
+      background: color-mix(in srgb, var(--bg) 88%, transparent);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+    .header-brand { display: flex; align-items: center; gap: 8px; text-decoration: none; color: inherit; }
+    .header-icon  { color: var(--accent); font-size: 16px; }
+    .header-name  { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; letter-spacing: -0.8px; }
+    .btn-back {
+      display: flex; align-items: center; gap: 8px;
+      background: transparent; border: 1px solid var(--border);
+      border-radius: var(--radius-sm); padding: 8px 16px;
+      color: var(--ink-muted); font-family: 'Jost', sans-serif;
+      font-size: 13px; font-weight: 500; cursor: pointer;
+      text-decoration: none; transition: all 0.2s;
+    }
+    .btn-back:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* ── Layout ── */
+    .page { max-width: 760px; margin: 0 auto; padding: 52px 24px 80px; }
+    .page-title { font-family: 'Playfair Display', serif; font-size: clamp(32px,5vw,44px); font-weight: 900; letter-spacing: -2px; margin-bottom: 8px; }
+    .page-title em { font-style: italic; color: var(--accent); }
+    .page-sub { font-size: 14px; font-weight: 300; color: var(--ink-muted); margin-bottom: 48px; }
+
+    /* ── Avatar card ── */
+    .avatar-card {
+      background: var(--surface); border: 1.5px solid var(--border);
+      border-radius: var(--radius-lg); padding: 40px; margin-bottom: 16px;
+      display: flex; align-items: center; gap: 36px;
+      box-shadow: var(--shadow); animation: fadeUp 0.4s cubic-bezier(0.16,1,0.3,1);
+    }
+    .avatar-wrap { position: relative; flex-shrink: 0; }
+    .avatar-big {
+      width: 96px; height: 96px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Playfair Display', serif; font-size: 40px; font-weight: 700; color: #fff;
+      background: var(--accent); overflow: hidden;
+      border: 3px solid var(--surface);
+      box-shadow: 0 0 0 2px var(--accent), var(--shadow);
+      transition: box-shadow 0.3s, background 0.3s;
+    }
+    .avatar-big img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+    .avatar-upload-btn {
+      position: absolute; bottom: 2px; right: 2px;
+      width: 28px; height: 28px; border-radius: 50%;
+      background: var(--ink); color: var(--bg);
+      border: 2px solid var(--surface); cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.2s;
+    }
+    .avatar-upload-btn:hover { background: var(--accent); }
+    .avatar-info { flex: 1; }
+    .avatar-username { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; letter-spacing: -1px; margin-bottom: 2px; }
+    .avatar-bio-display {
+      font-size: 13px; font-weight: 300; color: var(--ink-muted);
+      margin-bottom: 16px; min-height: 18px; font-style: italic;
+      line-height: 1.5;
+    }
+    .avatar-colors { display: flex; gap: 8px; flex-wrap: wrap; }
+    .color-swatch {
+      width: 30px; height: 30px; border-radius: 50%; cursor: pointer;
+      border: 2.5px solid transparent;
+      transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s;
+    }
+    .color-swatch:hover { transform: scale(1.18); }
+    .color-swatch.active { border-color: var(--ink); box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--ink); }
+
+    /* ── Stats strip ── */
+    .stats-strip {
+      background: var(--surface); border: 1.5px solid var(--border);
+      border-radius: var(--radius-lg); margin-bottom: 16px;
+      display: flex; box-shadow: var(--shadow); overflow: hidden;
+      animation: fadeUp 0.4s 0.05s cubic-bezier(0.16,1,0.3,1) both;
+    }
+    .stat-block {
+      flex: 1; padding: 28px 20px; text-align: center;
+      border-right: 1px solid var(--border); position: relative;
+    }
+    .stat-block:last-child { border-right: none; }
+    .stat-block::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+      background: var(--accent); transform: scaleX(0);
+      transition: transform 0.6s cubic-bezier(0.16,1,0.3,1); transform-origin: left;
+    }
+    .stat-block.filled::before { transform: scaleX(1); }
+    .stat-num { font-family: 'Playfair Display', serif; font-size: 36px; font-weight: 700; line-height: 1; color: var(--ink); margin-bottom: 6px; }
+    .stat-label { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--ink-muted); font-weight: 500; }
+
+    /* ── Section cards ── */
+    .section-card {
+      background: var(--surface); border: 1.5px solid var(--border);
+      border-radius: var(--radius-lg); margin-bottom: 16px;
+      overflow: hidden; box-shadow: var(--shadow);
+      animation: fadeUp 0.4s 0.1s cubic-bezier(0.16,1,0.3,1) both;
+    }
+    .section-card:nth-child(5) { animation-delay: 0.12s; }
+    .section-card:nth-child(6) { animation-delay: 0.16s; }
+    .section-card:nth-child(7) { animation-delay: 0.20s; }
+
+    .section-head { padding: 22px 28px 0; display: flex; align-items: center; gap: 10px; }
+    .section-icon {
+      width: 32px; height: 32px; border-radius: 8px;
+      background: var(--accent-lt); color: var(--accent);
+      display: flex; align-items: center; justify-content: center; font-size: 15px; flex-shrink: 0;
+    }
+    .section-title { font-family: 'Playfair Display', serif; font-size: 17px; font-weight: 700; letter-spacing: -0.3px; }
+    .section-body { padding: 18px 28px 28px; }
+
+    /* Inputs */
+    .fl-input, .fl-textarea {
+      width: 100%; background: var(--bg); border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm); padding: 12px 16px; color: var(--ink);
+      font-family: 'Jost', sans-serif; font-size: 15px; font-weight: 400;
+      outline: none; transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+    }
+    .fl-input:focus, .fl-textarea:focus {
+      border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-dim); background: var(--surface);
+    }
+    .fl-input::placeholder, .fl-textarea::placeholder { color: var(--ink-faint); }
+    .fl-textarea { resize: vertical; min-height: 90px; line-height: 1.6; font-size: 14px; }
+
+    .field-row { display: flex; gap: 10px; }
+    .char-count { font-size: 11px; color: var(--ink-faint); text-align: right; margin-top: 6px; }
+
+    .btn-save {
+      padding: 12px 22px; background: var(--accent); color: #fff;
+      border: none; border-radius: var(--radius-sm);
+      font-family: 'Jost', sans-serif; font-size: 14px; font-weight: 600;
+      cursor: pointer; white-space: nowrap; transition: all 0.2s;
+    }
+    .btn-save:hover { background: color-mix(in srgb, var(--accent) 80%, black); transform: translateY(-1px); }
+
+    /* Theme picker */
+    .theme-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .theme-option {
+      border: 2px solid var(--border); border-radius: var(--radius);
+      padding: 20px 16px; cursor: pointer; background: transparent;
+      font-family: 'Jost', sans-serif; text-align: left;
+      transition: all 0.25s; position: relative; overflow: hidden;
+    }
+    .theme-option:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+    .theme-option.active { border-color: var(--accent); }
+    .theme-option.active::after { content: '✦'; position: absolute; top: 12px; right: 14px; color: var(--accent); font-size: 14px; }
+    .theme-swatch { width: 100%; height: 48px; border-radius: 8px; margin-bottom: 14px; display: flex; align-items: center; justify-content: center; gap: 6px; }
+    .theme-swatch-sand     { background: #f7f4ee; border: 1px solid #e4dfd5; }
+    .theme-swatch-midnight { background: #0f0f0f; border: 1px solid #2e2e2e; }
+    .theme-dot { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
+    .theme-name { font-size: 15px; font-weight: 600; color: var(--ink); margin-bottom: 3px; }
+    .theme-desc { font-size: 12px; font-weight: 300; color: var(--ink-muted); }
+
+    /* Toast */
+    .toast {
+      position: fixed; bottom: 28px; left: 50%;
+      transform: translateX(-50%) translateY(16px);
+      background: var(--ink); color: var(--bg);
+      border-radius: 30px; padding: 12px 24px;
+      font-size: 13px; font-weight: 500; white-space: nowrap;
+      opacity: 0; pointer-events: none;
+      transition: all 0.3s cubic-bezier(0.16,1,0.3,1); z-index: 100;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .toast.ok   { background: var(--accent); }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 640px) {
+      .app-header { padding: 14px 20px; }
+      .page { padding: 32px 16px 60px; }
+      .avatar-card { flex-direction: column; align-items: flex-start; gap: 20px; padding: 28px; }
+      .theme-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="app-header">
+    <a href="index.html" class="header-brand">
+      <span class="header-icon">✦</span>
+      <span class="header-name">Flowlist</span>
+    </a>
+    <a href="index.html" class="btn-back">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+        <path d="M9 2L4 7l5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Назад
+    </a>
+  </header>
+
+  <main class="page">
+    <h1 class="page-title">Мій <em>профіль</em></h1>
+    <p class="page-sub">Персоналізуй свій простір</p>
+
+    <!-- Avatar card -->
+    <div class="avatar-card">
+      <div class="avatar-wrap">
+        <div class="avatar-big" id="avatar-big">N</div>
+        <button class="avatar-upload-btn" onclick="document.getElementById('avatar-file').click()" title="Змінити фото">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+            <path d="M7.5 1.5l3 3L3 12H0V9L7.5 1.5z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round" fill="none"/>
+          </svg>
+        </button>
+        <input type="file" id="avatar-file" accept="image/*" style="display:none" onchange="handlePhoto(event)"/>
+      </div>
+      <div class="avatar-info">
+        <div class="avatar-username" id="avatar-username">User</div>
+        <div class="avatar-bio-display" id="bio-display">Розкажи про себе...</div>
+        <div class="avatar-colors" id="color-swatches"></div>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-strip">
+      <div class="stat-block" id="sb-total">
+        <div class="stat-num" id="stat-total">—</div>
+        <div class="stat-label">Всього задач</div>
+      </div>
+      <div class="stat-block" id="sb-done">
+        <div class="stat-num" id="stat-done">—</div>
+        <div class="stat-label">Виконано</div>
+      </div>
+      <div class="stat-block" id="sb-left">
+        <div class="stat-num" id="stat-left">—</div>
+        <div class="stat-label">Залишилось</div>
+      </div>
+      <div class="stat-block" id="sb-pct">
+        <div class="stat-num" id="stat-pct">—</div>
+        <div class="stat-label">Прогрес</div>
+      </div>
+    </div>
+
+    <!-- Name -->
+    <div class="section-card">
+      <div class="section-head">
+        <div class="section-icon">✎</div>
+        <div class="section-title">Імʼя користувача</div>
+      </div>
+      <div class="section-body">
+        <div class="field-row">
+          <input type="text" id="name-input" class="fl-input" placeholder="Введи своє імʼя" maxlength="30"/>
+          <button class="btn-save" onclick="saveName()">Зберегти</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bio -->
+    <div class="section-card">
+      <div class="section-head">
+        <div class="section-icon">✍</div>
+        <div class="section-title">Біографія</div>
+      </div>
+      <div class="section-body">
+        <textarea
+          id="bio-input"
+          class="fl-textarea"
+          placeholder="Розкажи про себе — ким ти є, що тебе надихає, над чим зараз працюєш..."
+          maxlength="200"
+          oninput="updateCharCount()"
+        ></textarea>
+        <div class="char-count"><span id="char-count">0</span> / 200</div>
+        <div style="margin-top:10px;">
+          <button class="btn-save" onclick="saveBio()">Зберегти біо</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Theme -->
+    <div class="section-card">
+      <div class="section-head">
+        <div class="section-icon">◑</div>
+        <div class="section-title">Тема</div>
+      </div>
+      <div class="section-body">
+        <div class="theme-grid">
+          <button class="theme-option" id="theme-sand" onclick="setTheme('sand')">
+            <div class="theme-swatch theme-swatch-sand">
+              <span class="theme-dot" style="background:#2d5a27"></span>
+              <span class="theme-dot" style="background:#1a1814"></span>
+              <span class="theme-dot" style="background:#e4dfd5"></span>
+            </div>
+            <div class="theme-name">Sand</div>
+            <div class="theme-desc">Теплий, природній день</div>
+          </button>
+          <button class="theme-option" id="theme-midnight" onclick="setTheme('midnight')">
+            <div class="theme-swatch theme-swatch-midnight">
+              <span class="theme-dot" style="background:#4a9e42"></span>
+              <span class="theme-dot" style="background:#f0ede8"></span>
+              <span class="theme-dot" style="background:#2e2e2e"></span>
+            </div>
+            <div class="theme-name">Midnight</div>
+            <div class="theme-desc">Темна, зосереджена ніч</div>
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const COLORS = [
+      '#2d5a27','#1a6b5a','#1a4a7a','#6b2d7a',
+      '#7a2d2d','#b07d1a','#2d6b6b','#5a4a8a',
+      '#8a4a2d','#3d7a3d','#6b1a4a','#1a5a6b',
+    ];
+
+    let profile = { name: '', color: '#2d5a27', theme: 'sand', photoData: null, bio: '' };
+
+    function loadProfile() {
+      const u = localStorage.getItem('fl_user');
+      if (u) profile.name = u;
+      const saved = localStorage.getItem('fl_profile');
+      if (saved) { try { Object.assign(profile, JSON.parse(saved)); } catch {} }
+      applyTheme(profile.theme);
+      renderColorSwatches();
+      syncUI();
+      loadStats();
+    }
+
+    function saveProfileData() {
+      localStorage.setItem('fl_profile', JSON.stringify(profile));
+      localStorage.setItem('fl_user', profile.name);
+    }
+
+    function syncUI() {
+      document.getElementById('name-input').value       = profile.name;
+      document.getElementById('avatar-username').textContent = profile.name || 'User';
+      document.getElementById('bio-input').value        = profile.bio || '';
+      document.getElementById('bio-display').textContent =
+        profile.bio || 'Розкажи про себе...';
+      document.getElementById('bio-display').style.opacity = profile.bio ? '1' : '0.45';
+      updateCharCount();
+
+      // Avatar
+      const av = document.getElementById('avatar-big');
+      if (profile.photoData) {
+        av.innerHTML = `<img src="${profile.photoData}"/>`;
+        av.style.background = 'transparent';
+        av.style.boxShadow  = 'none';
+      } else {
+        av.innerHTML        = (profile.name[0] || '?').toUpperCase();
+        av.style.background = profile.color;
+        av.style.boxShadow  = `0 0 0 3px var(--surface), 0 0 0 5px ${profile.color}`;
+      }
+
+      // Theme buttons
+      document.getElementById('theme-sand').classList.toggle('active', profile.theme === 'sand');
+      document.getElementById('theme-midnight').classList.toggle('active', profile.theme === 'midnight');
+
+      // Color swatches active
+      document.querySelectorAll('.color-swatch').forEach(s =>
+        s.classList.toggle('active', s.dataset.color === profile.color)
+      );
+    }
+
+    function loadStats() {
+      const token = localStorage.getItem('fl_token');
+      if (!token) return;
+      fetch('http://localhost:8000/tasks/', { headers: { Authorization: `Bearer ${token}` } })
+        .then(r => r.ok ? r.json() : null)
+        .then(tasks => {
+          if (!tasks) return;
+          const total = tasks.length;
+          const done  = tasks.filter(t => t.completed).length;
+          const left  = total - done;
+          const pct   = total ? Math.round((done / total) * 100) : 0;
+          document.getElementById('stat-total').textContent = total;
+          document.getElementById('stat-done').textContent  = done;
+          document.getElementById('stat-left').textContent  = left;
+          document.getElementById('stat-pct').textContent   = pct + '%';
+          setTimeout(() => {
+            if (total > 0) document.getElementById('sb-total').classList.add('filled');
+            if (done > 0)  document.getElementById('sb-done').classList.add('filled');
+            if (pct > 0)   document.getElementById('sb-pct').classList.add('filled');
+          }, 300);
+        }).catch(() => {});
+    }
+
+    function saveName() {
+      const val = document.getElementById('name-input').value.trim();
+      if (!val) return;
+      profile.name = val;
+      saveProfileData();
+      syncUI();
+      showToast('Імʼя збережено ✦', 'ok');
+    }
+
+    function saveBio() {
+      profile.bio = document.getElementById('bio-input').value.trim();
+      saveProfileData();
+      syncUI();
+      showToast('Біографію збережено ✍', 'ok');
+    }
+
+    function updateCharCount() {
+      const len = document.getElementById('bio-input').value.length;
+      document.getElementById('char-count').textContent = len;
+    }
+
+    function renderColorSwatches() {
+      document.getElementById('color-swatches').innerHTML = COLORS.map(c => `
+        <div class="color-swatch ${c === profile.color ? 'active' : ''}"
+             style="background:${c}" data-color="${c}"
+             onclick="pickColor('${c}')"></div>
+      `).join('');
+    }
+
+    function pickColor(color) {
+      profile.color     = color;
+      profile.photoData = null;
+      saveProfileData();
+      syncUI();
+    }
+
+    function handlePhoto(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = ev => {
+        profile.photoData = ev.target.result;
+        saveProfileData();
+        syncUI();
+        showToast('Фото оновлено 📷', 'ok');
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function setTheme(theme) {
+      profile.theme = theme;
+      saveProfileData();
+      applyTheme(theme);
+      syncUI();
+      showToast(theme === 'midnight' ? 'Midnight увімкнено 🌙' : 'Sand увімкнено ☀️', 'ok');
+    }
+
+    function applyTheme(theme) {
+      document.documentElement.setAttribute('data-theme', theme);
+    }
+
+    let _tt;
+    function showToast(msg, type = '') {
+      const el = document.getElementById('toast');
+      el.textContent = msg;
+      el.className   = `toast show${type ? ' ' + type : ''}`;
+      clearTimeout(_tt);
+      _tt = setTimeout(() => el.classList.remove('show'), 2600);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      loadProfile();
+      document.getElementById('name-input').addEventListener('keydown', e => {
+        if (e.key === 'Enter') saveName();
+      });
+    });
+  </script>
+</body>
+</html>

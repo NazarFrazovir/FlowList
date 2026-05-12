@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Flowlist — Твій простір задач</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css"/>
+  <link rel="stylesheet" href="fixes.css"/>
+  <link rel="stylesheet" href="search-dnd.css"/>
+  <link rel="stylesheet" href="extras.css"/>
+  <link rel="stylesheet" href="features.css"/>
+
+</head>
+<!-- Confetti canvas -->
+<canvas id="confetti-canvas" style="position:fixed;inset:0;pointer-events:none;z-index:999;display:none"></canvas>
+
+<!-- Edit modal -->
+<div class="edit-overlay" id="edit-overlay">
+  <div class="edit-modal">
+    <div class="edit-header">
+      <span class="edit-title">Редагувати задачу</span>
+      <button class="edit-close" onclick="closeEdit()">✕</button>
+    </div>
+    <div class="edit-body">
+      <div class="field"><label>Назва</label><input type="text" id="edit-title" class="fl-input"/></div>
+      <div class="field"><label>Опис</label><input type="text" id="edit-desc" class="fl-input"/></div>
+      <div class="edit-row">
+        <div class="field" style="flex:1"><label>Пріоритет</label>
+          <select id="edit-priority" class="priority-select full">
+            <option value="low">🟢 Низький</option>
+            <option value="medium">🟡 Середній</option>
+            <option value="high">🔴 Важливий</option>
+          </select>
+        </div>
+        <div class="field" style="flex:1"><label>Дедлайн</label>
+          <input type="datetime-local" id="edit-deadline" class="fl-input deadline-input full"/>
+        </div>
+      </div>
+    </div>
+    <div class="edit-footer">
+      <button class="btn-cancel" onclick="closeEdit()">Скасувати</button>
+      <button class="btn-save-edit" onclick="saveEdit()">Зберегти</button>
+    </div>
+  </div>
+</div>
+
+<body>
+
+  <!-- ── AUTH SCREEN ── -->
+  <div id="auth-screen">
+    <div class="auth-bg-orb orb-1"></div>
+    <div class="auth-bg-orb orb-2"></div>
+
+    <div class="auth-card">
+      <div class="auth-brand">
+        <div class="brand-icon">✦</div>
+        <div class="brand-name">Flowlist</div>
+        <div class="brand-tagline">простір для твоїх думок і справ</div>
+      </div>
+
+      <div class="tab-row">
+        <button class="tab-btn active" data-tab="login" onclick="switchTab('login')">Вхід</button>
+        <button class="tab-btn" data-tab="register" onclick="switchTab('register')">Реєстрація</button>
+        <div class="tab-indicator" id="tab-indicator"></div>
+      </div>
+
+      <!-- Login -->
+      <div id="login-form" class="auth-form">
+        <div class="field">
+          <label>Логін</label>
+          <input type="text" id="login-username" placeholder="ім'я користувача" autocomplete="username"/>
+        </div>
+        <div class="field">
+          <label>Пароль</label>
+          <input type="password" id="login-password" placeholder="••••••••" autocomplete="current-password"/>
+        </div>
+        <button class="btn-primary" onclick="login()">
+          <span>Увійти</span>
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+
+      <!-- Register -->
+      <div id="register-form" class="auth-form" style="display:none">
+        <div class="field">
+          <label>Логін</label>
+          <input type="text" id="reg-username" placeholder="ім'я користувача" autocomplete="username"/>
+        </div>
+        <div class="field">
+          <label>Email</label>
+          <input type="email" id="reg-email" placeholder="you@example.com" autocomplete="email"/>
+        </div>
+        <div class="field">
+          <label>Пароль</label>
+          <input type="password" id="reg-password" placeholder="••••••••" autocomplete="new-password"/>
+        </div>
+        <button class="btn-primary" onclick="register()">
+          <span>Створити акаунт</span>
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+
+      <div class="auth-error" id="auth-error"></div>
+    </div>
+  </div>
+
+  <!-- ── APP SCREEN ── -->
+  <div id="app-screen" style="display:none">
+
+    <header class="app-header">
+      <div class="header-brand">
+        <span class="header-icon">✦</span>
+        <span class="header-name">Flowlist</span>
+      </div>
+      <div class="header-right">
+        <a href="profile.html" class="user-pill" style="text-decoration:none;color:inherit;">
+          <div class="user-avatar" id="user-avatar">N</div>
+          <span id="user-name">User</span>
+        </a>
+        <!-- Quote of the day -->
+      <div class="quote-bar" id="quote-bar">
+        <span class="quote-icon">✦</span>
+        <span id="quote-text">Завантаження...</span>
+      </div>
+
+      <!-- Mood tracker -->
+      <div class="mood-bar" id="mood-bar"></div>
+
+      <!-- Toolbar кнопки -->
+      <button class="toolbar-btn" onclick="openFocus()">⏱ Focus</button>
+      <button class="toolbar-btn" onclick="openAI()">🤖 AI</button>
+        <div id="user-bio"
+          style="
+          font-size:11px;
+          color:var(--ink-muted)
+          ">
+        </div>
+        <button class="btn-logout" onclick="logout()">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M5 2H2v10h3M9 10l3-3-3-3M12 7H5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Вийти
+        </button>
+      </div>
+    </header>
+
+    <main class="app-main">
+
+      <!-- Hero -->
+      <div class="hero">
+        <h1 class="hero-title">
+          Твої <em>справи</em><br/>на сьогодні
+        </h1>
+        <div class="hero-stats">
+          <div class="stat">
+            <div class="stat-num" id="stat-total">0</div>
+            <div class="stat-label">всього</div>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat">
+            <div class="stat-num" id="stat-done">0</div>
+            <div class="stat-label">виконано</div>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat">
+            <div class="stat-num" id="stat-left">0</div>
+            <div class="stat-label">залишилось</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Progress bar -->
+      <div class="progress-wrap">
+        <div class="progress-bar">
+          <div class="progress-fill" id="progress-fill"></div>
+        </div>
+        <span class="progress-label" id="progress-label">0%</span>
+      </div>
+
+      <!-- Toolbar -->
+<div class="app-toolbar">
+  <button class="toolbar-btn accent" onclick="openAnalytics()">
+    📊 Аналітика
+  </button>
+  <button class="toolbar-btn" onclick="exportCSV()">
+    📥 CSV
+  </button>
+  <button class="toolbar-btn" onclick="exportJSON()">
+    📦 JSON
+  </button>
+</div>
+
+      <!-- Add task -->
+<div class="add-task-wrap">
+  <div class="add-task-field field-title">
+    <div class="field-icon">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 8h12M2 4h8M2 12h6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+    </div>
+    <input type="text" id="new-title" placeholder="Що потрібно зробити?" autocomplete="off"/>
+  </div>
+  <div class="add-task-row2">
+    <div class="add-task-field field-desc" style="flex:1">
+      <div class="field-icon">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 5h12M2 8h8M2 11h5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      </div>
+      <input type="text" id="new-desc" placeholder="Деталі (необов'язково)" autocomplete="off"/>
+    </div>
+    <select id="new-priority" class="priority-select">
+      <option value="low">🟢 Низький</option>
+      <option value="medium" selected>🟡 Середній</option>
+      <option value="high">🔴 Важливий</option>
+    </select>
+    <input type="datetime-local" id="new-deadline" class="deadline-input"/>
+    <button class="btn-add" onclick="addTask()">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+</div>
+
+      <!-- Filter -->
+      <div class="search-filter-bar">
+        <div class="search-wrap">
+          <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
+            <circle cx="6.5" cy="6.5" r="4.5" stroke="currentColor" stroke-width="1.4"/>
+            <path d="M10 10l3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+          </svg>
+          <input type="text" id="search-input" placeholder="Пошук задач..." oninput="renderTasks()"/>
+        </div>
+        <div class="filter-bar">
+          <button class="filter-btn active" onclick="setFilter('all', this)">Всі</button>
+          <button class="filter-btn" onclick="setFilter('active', this)">Активні</button>
+          <button class="filter-btn" onclick="setFilter('done', this)">Виконані</button>
+        </div>
+        <div class="sort-bar">
+          <span class="sort-label">Сортувати:</span>
+          <select id="sort-select" class="sort-select" onchange="renderTasks()">
+            <option value="manual">Вручну</option>
+            <option value="priority">Пріоритет</option>
+            <option value="deadline">Дедлайн</option>
+            <option value="created">Дата створення</option>
+            <option value="alpha">А → Я</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Task list -->
+      <div id="task-list"></div>
+
+    </main>
+  </div>
+
+<!-- PROFILE MODAL -->
+<div class="modal-overlay" id="profile-modal">
+
+  <div class="modal">
+
+    <div class="modal-header">
+      <div class="modal-title">Профіль</div>
+
+      <button class="modal-close" onclick="closeProfileModal()">
+        ×
+      </button>
+    </div>
+
+    <div class="modal-body">
+
+      <!-- Username -->
+      <div class="field">
+        <label>Ім’я</label>
+        <input type="text" id="profile-name">
+      </div>
+      <div class="field">
+        <label>Біографія</label>
+
+        <input
+          type="text"
+          id="profile-bio"
+          placeholder="frontend wizard ✦">
+      </div>
+
+      <!-- Theme -->
+      <div>
+        <div class="section-label">Тема</div>
+
+        <div class="theme-options">
+
+          <button class="theme-btn"
+                  onclick="changeTheme('light')">
+            <div class="theme-preview theme-preview-sand"></div>
+            <div class="theme-name">Light</div>
+          </button>
+
+          <button class="theme-btn"
+                  onclick="changeTheme('sand')">
+            <div class="theme-preview theme-preview-sand"></div>
+            <div class="theme-name">Sand</div>
+          </button>
+
+          <button class="theme-btn"
+                  onclick="changeTheme('midnight')">
+            <div class="theme-preview theme-preview-midnight"></div>
+            <div class="theme-name">Midnight</div>
+          </button>
+
+          <button class="theme-btn"
+                  onclick="changeTheme('moonlight')">
+            <div class="theme-preview"
+                 style="background:#172036;border:1px solid #2a3655">
+            </div>
+
+            <div class="theme-name">Moonlight</div>
+          </button>
+
+        </div>
+      </div>
+      <div class="profile-avatar-section">
+
+        <img
+          id="profile-avatar-img"
+          class="profile-avatar-big"
+          src="https://i.pravatar.cc/200"
+        >
+
+        <div>
+          <input
+            type="file"
+            id="avatar-upload"
+            accept="image/*">
+        </div>
+      </div>
+
+
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-save"
+              onclick="saveProfile()">
+        Зберегти
+      </button>
+    </div>
+
+  </div>
+</div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <!-- Analytics modal -->
+<div class="analytics-overlay" id="analytics-overlay">
+  <div class="analytics-modal">
+    <div class="analytics-header">
+      <span class="analytics-title">Аналітика ✦</span>
+      <button class="analytics-close" onclick="closeAnalytics()">✕</button>
+    </div>
+    <div class="analytics-body">
+      <div class="an-grid">
+        <div class="an-card">
+          <div class="an-card-num" id="an-total">0</div>
+          <div class="an-card-label">Всього задач</div>
+        </div>
+        <div class="an-card">
+          <div class="an-card-num" id="an-done">0</div>
+          <div class="an-card-label">Виконано</div>
+        </div>
+        <div class="an-card gold">
+          <div class="an-card-num" id="an-streak">0 днів</div>
+          <div class="an-card-label">Streak 🔥</div>
+        </div>
+        <div class="an-card danger">
+          <div class="an-card-num" id="an-overdue">0</div>
+          <div class="an-card-label">Прострочено</div>
+        </div>
+        <div class="an-card danger">
+          <div class="an-card-num" id="an-high">0</div>
+          <div class="an-card-label">Важливих</div>
+        </div>
+        <div class="an-card">
+          <div class="an-card-num" id="an-pct">0%</div>
+          <div class="an-card-label">Прогрес</div>
+        </div>
+      </div>
+      <div class="an-chart-title">Виконано за останні 7 днів</div>
+      <div class="an-chart-wrap">
+        <canvas id="chart-canvas"></canvas>
+      </div>
+      <div class="an-progress-wrap">
+        <div class="an-ring">
+          <svg width="72" height="72" viewBox="0 0 72 72">
+            <circle class="an-ring-track" cx="36" cy="36" r="30"/>
+            <circle class="an-ring-fill" id="an-ring-fill" cx="36" cy="36" r="30"
+              stroke-dasharray="188.5"
+              stroke-dashoffset="188.5"/>
+          </svg>
+          <div class="an-ring-label" id="an-ring-label">0%</div>
+        </div>
+        <div class="an-progress-text">
+          <h4>Загальний прогрес</h4>
+          <p>Продовжуй — кожна виконана задача наближає до мети!</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+  <!-- Focus / Pomodoro -->
+<div class="focus-overlay" id="focus-overlay">
+  <div class="focus-modal">
+    <button class="focus-close" onclick="closeFocus()">✕</button>
+    <div class="focus-timer" id="focus-timer">25:00</div>
+    <div class="focus-label" id="focus-label">Фокус</div>
+    <div class="focus-controls">
+      <button class="btn-focus-start" id="focus-btn" onclick="toggleFocus()">▶ Старт</button>
+      <button class="btn-focus-reset" onclick="resetFocus()">↺ Скинути</button>
+    </div>
+    <div class="focus-modes">
+      <button onclick="setFocusMode(25,5)">25/5</button>
+      <button onclick="setFocusMode(50,10)">50/10</button>
+      <button onclick="setFocusMode(90,20)">90/20</button>
+    </div>
+  </div>
+</div>
+
+<!-- AI Assistant -->
+<div class="ai-overlay" id="ai-overlay">
+  <div class="ai-modal">
+    <div class="ai-header">
+      <span>🤖 AI-помічник</span>
+      <button onclick="closeAI()">✕</button>
+    </div>
+    <div class="ai-body" id="ai-body"></div>
+    <div class="ai-input-wrap">
+      <input type="text" id="ai-input" placeholder="Запитай або опиши задачу..."
+             onkeydown="if(event.key==='Enter') sendAI()"/>
+      <button onclick="sendAI()">→</button>
+    </div>
+    <div class="ai-key-wrap">
+      <input type="password" id="ai-key" placeholder="Claude API ключ (зберігається локально)"/>
+      <button onclick="saveAIKey()">Зберегти</button>
+    </div>
+  </div>
+</div>
+
+  <script src="app.js"></script>
+  <script src="features.js"></script>
+
+</body>
+</html>

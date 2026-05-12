@@ -1,0 +1,89 @@
+/* ══════════════════════════════════════════
+   SEARCH + FILTER BAR
+══════════════════════════════════════════ */
+
+.search-filter-bar {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.search-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 16px;
+  box-shadow: var(--shadow);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.search-wrap:focus-within {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-dim), var(--shadow);
+}
+
+.search-wrap svg {
+  color: var(--ink-faint);
+  flex-shrink: 0;
+  transition: color 0.2s;
+}
+
+.search-wrap:focus-within svg { color: var(--accent); }
+
+.search-wrap input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--ink);
+  font-family: 'Jost', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+}
+
+.search-wrap input::placeholder { color: var(--ink-faint); }
+
+/* Search highlight */
+mark.search-mark {
+  background: color-mix(in srgb, var(--accent) 25%, transparent);
+  color: var(--ink);
+  border-radius: 3px;
+  padding: 0 2px;
+}
+
+/* ══════════════════════════════════════════
+   DRAG & DROP
+══════════════════════════════════════════ */
+
+.drag-handle {
+  color: var(--ink-faint);
+  cursor: grab;
+  display: flex;
+  align-items: center;
+  padding: 4px 2px;
+  flex-shrink: 0;
+  opacity: 0;
+  transition: opacity 0.2s, color 0.2s;
+}
+
+.task-item:hover .drag-handle { opacity: 1; }
+.drag-handle:hover { color: var(--ink-muted); }
+.drag-handle:active { cursor: grabbing; }
+
+/* While dragging */
+.task-item.dragging {
+  opacity: 0.4;
+  transform: scale(0.98);
+  box-shadow: none !important;
+}
+
+/* Drop target highlight */
+.task-item.drag-over {
+  border-color: var(--accent) !important;
+  box-shadow: 0 0 0 3px var(--accent-dim) !important;
+  transform: translateX(4px);
+}
